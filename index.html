@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HRP Triage — Maternal Health PPP System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════════════════════ */
+:root {
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* Core palette */
+  --ink:       #0f1117;
+  --ink-2:     #2d3142;
+  --ink-3:     #5a607a;
+  --ink-4:     #8b93ad;
+  --border:    #e4e7f0;
+  --surface:   #f7f8fc;
+  --white:     #ffffff;
+
+  /* Brand */
+  --crimson:   #c0392b;
+  --crimson-l: #fdf0ee;
+  --crimson-d: #96211a;
+  --teal:      #0d7a6e;
+  --teal-l:    #e6f4f2;
+  --teal-d:    #085c53;
+  --amber:     #d4750a;
+  --amber-l:   #fef6e6;
+  --cobalt:    #2354b8;
+  --cobalt-l:  #edf1fb;
+  --violet:    #5c3fa0;
+  --violet-l:  #f0ecfb;
+  --green:     #1a7a40;
+  --green-l:   #e8f5ee;
+
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 4px rgba(15,17,23,.06);
+  --shadow:    0 4px 20px rgba(15,17,23,.09);
+  --shadow-lg: 0 12px 40px rgba(15,17,23,.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--ink);
+  overflow: hidden;
+}
+
+button { font-family: var(--font-body); cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: var(--font-body); font-size: 14px; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════════════════
+   SHELL — Login screen & role picker
+═══════════════════════════════════════════════════════════ */
+#shell {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ink);
+  position: relative; overflow: hidden;
+}
+
+.shell-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 20% 80%, #c0392b22 0%, transparent 60%),
+              radial-gradient(ellipse 60% 50% at 80% 20%, #2354b822 0%, transparent 60%);
+}
+
+.shell-grid {
+  position: absolute; inset: 0; opacity: .06;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.login-card {
+  position: relative; z-index: 1;
+  width: 420px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp .5s ease both;
+}
+
+.login-logo {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+}
+
+.login-logo-icon {
+  width: 44px; height: 44px;
+  background: var(--crimson);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: white;
+}
+
+.login-logo-text h1 {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 800; color: var(--ink);
+  letter-spacing: -.3px;
+}
+
+.login-logo-text p {
+  font-size: 12px; color: var(--ink-4); margin-top: 1px;
+}
+
+.login-heading { font-size: 14px; font-weight: 500; color: var(--ink-3); margin-bottom: 16px; }
+
+.role-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px;
+}
+
+.role-btn {
+  padding: 14px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer;
+  transition: all .2s ease;
+  text-align: center;
+}
+
+.role-btn:hover { border-color: var(--crimson); background: var(--crimson-l); transform: translateY(-2px); }
+.role-btn.active { border-color: var(--crimson); background: var(--crimson-l); }
+
+.role-btn-icon { font-size: 24px; }
+.role-btn-label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.role-btn-sub { font-size: 11px; color: var(--ink-4); }
+
+.form-field { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--ink-3); display: block; margin-bottom: 6px; }
+
+.form-input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--ink);
+  background: var(--white);
+  transition: border-color .15s;
+  outline: none;
+}
+
+.form-input:focus { border-color: var(--crimson); }
+
+.btn-primary {
+  width: 100%; padding: 13px;
+  background: var(--crimson);
+  color: white; font-weight: 600; font-size: 15px;
+  border-radius: var(--radius-sm);
+  transition: all .2s; cursor: pointer;
+  border: none;
+}
+.btn-primary:hover { background: var(--crimson-d); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,57,43,.3); }
+
+.demo-hint {
+  margin-top: 16px; text-align: center;
+  font-size: 11px; color: var(--ink-4);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   APP SHELL — post-login
+═══════════════════════════════════════════════════════════ */
+#app {
+  display: none;
+  width: 100vw; height: 100vh;
+  flex-direction: column;
+  background: var(--surface);
+}
+#app.active { display: flex; }
+
+/* Top nav */
+.topnav {
+  height: 58px; flex-shrink: 0;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 16px;
+}
+
+.topnav-logo {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; color: var(--crimson);
+  letter-spacing: -.5px;
+}
+
+.topnav-role {
+  font-size: 12px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
+}
+
+.topnav-spacer { flex: 1; }
+
+.topnav-user {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.topnav-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white;
+}
+
+.topnav-name { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+
+.btn-logout {
+  font-size: 12px; color: var(--ink-4);
+  padding: 5px 10px; border-radius: 6px;
+  border: 1px solid var(--border);
+  transition: all .2s;
+}
+.btn-logout:hover { color: var(--crimson); border-color: var(--crimson); }
+
+/* Tab bar */
+.tabbar {
+  display: flex;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  overflow-x: auto; flex-shrink: 0;
+}
+
+.tab-item {
+  padding: 12px 16px;
+  font-size: 13px; font-weight: 500; color: var(--ink-4);
+  white-space: nowrap; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  position: relative;
+}
+
+.tab-item:hover { color: var(--ink-2); }
+.tab-item.active { color: var(--crimson); border-bottom-color: var(--crimson); font-weight: 600; }
+
+.tab-badge {
+  position: absolute; top: 8px; right: 8px;
+  width: 16px; height: 16px;
+  background: var(--crimson);
+  border-radius: 50%; color: white;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Page area */
+.page-area {
+  flex: 1; overflow-y: auto;
+  padding: 24px 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMMON COMPONENTS
+═══════════════════════════════════════════════════════════ */
+.page-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700; color: var(--ink);
+}
+
+.page-subtitle { font-size: 13px; color: var(--ink-4); margin-top: 2px; }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--ink-3); letter-spacing: .3px;
+  margin-bottom: 16px; text-transform: uppercase;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid; gap: 14px; margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-label { font-size: 12px; color: var(--ink-4); font-weight: 500; margin-bottom: 6px; }
+.stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--ink); }
+.stat-delta { font-size: 11px; color: var(--green); margin-top: 4px; }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-high    { background: #fde8e7; color: #b02020; }
+.badge-medium  { background: #fef3e2; color: #9a5a00; }
+.badge-low     { background: #e6f4ee; color: #166534; }
+.badge-pending { background: #fef3e2; color: #9a5a00; }
+.badge-accepted { background: #e6f4ee; color: #166534; }
+.badge-routed  { background: #f0ecfb; color: #5c3fa0; }
+.badge-done    { background: #e6f4ee; color: #166534; }
+.badge-urgent  { background: #fde8e7; color: #b02020; }
+.badge-routine { background: #e6f4ee; color: #166534; }
+
+/* Referral list table */
+.ref-table { width: 100%; border-collapse: collapse; }
+.ref-table th {
+  font-size: 11px; font-weight: 600; color: var(--ink-4);
+  text-transform: uppercase; letter-spacing: .4px;
+  padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.ref-table td {
+  padding: 13px 14px; font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:hover td { background: #fafbfd; }
+
+.patient-cell { display: flex; align-items: center; gap: 10px; }
+.patient-avatar-sm {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #2354b8, #5c3fa0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.patient-name-sm { font-weight: 600; color: var(--ink); font-size: 13px; }
+.patient-meta-sm { font-size: 11px; color: var(--ink-4); }
+
+.action-row { display: flex; gap: 6px; }
+
+.btn-sm {
+  padding: 6px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  border: none; transition: all .15s;
+}
+.btn-accept { background: var(--green-l); color: var(--green); }
+.btn-accept:hover { background: #c8e6d4; }
+.btn-reject { background: #fde8e7; color: var(--crimson); }
+.btn-reject:hover { background: #fbd2ce; }
+.btn-view   { background: var(--cobalt-l); color: var(--cobalt); }
+.btn-view:hover { background: #dce5f8; }
+.btn-upload { background: var(--amber-l); color: var(--amber); }
+.btn-upload:hover { background: #fce9c0; }
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(15,17,23,.6);
+  align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn .2s ease;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp .3s ease;
+}
+
+.modal-header {
+  padding: 24px 24px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 700; color: var(--ink);
+}
+.modal-subtitle { font-size: 12px; color: var(--ink-4); margin-top: 3px; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); color: var(--ink-3);
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  border: none;
+  transition: background .15s;
+}
+.modal-close:hover { background: var(--border); }
+.modal-body { padding: 20px 24px 24px; }
+
+/* ═══════════════════════════════════════════════════════════
+   DECISION COMPONENT (Accept / Reject)
+═══════════════════════════════════════════════════════════ */
+.decision-tiles {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+
+.decision-tile {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px; cursor: pointer;
+  transition: all .2s; text-align: center;
+}
+.decision-tile:hover { transform: translateY(-2px); }
+.decision-tile.accept:hover, .decision-tile.accept.sel { border-color: var(--green); background: var(--green-l); }
+.decision-tile.reject:hover, .decision-tile.reject.sel { border-color: var(--crimson); background: var(--crimson-l); }
+.decision-tile-icon { font-size: 30px; margin-bottom: 8px; }
+.decision-tile-label { font-weight: 700; font-size: 14px; color: var(--ink); }
+.decision-tile-sub { font-size: 11px; color: var(--ink-4); margin-top: 3px; }
+
+.form-section { margin-bottom: 16px; }
+.form-select {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--ink);
+  background: var(--white); cursor: pointer;
+  outline: none; transition: border-color .15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238b93ad' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.form-select:focus { border-color: var(--crimson); }
+
+.routing-notice {
+  background: var(--cobalt-l); border-left: 3px solid var(--cobalt);
+  border-radius: 8px; padding: 12px 14px; margin-top: 14px;
+  display: flex; gap: 10px;
+}
+.routing-notice p { font-size: 12px; color: var(--ink-2); line-height: 1.6; margin: 0; }
+
+.btn-full {
+  width: 100%; padding: 13px;
+  border-radius: var(--radius-sm); border: none; cursor: pointer;
+  font-family: var(--font-body); font-weight: 700; font-size: 15px;
+  transition: all .2s;
+}
+.btn-full-green { background: var(--green); color: white; }
+.btn-full-green:hover { background: #145d31; box-shadow: 0 6px 20px rgba(26,122,64,.3); }
+.btn-full-red { background: var(--crimson); color: white; }
+.btn-full-red:hover { background: var(--crimson-d); box-shadow: 0 6px 20px rgba(192,57,43,.3); }
+.btn-full-cobalt { background: var(--cobalt); color: white; }
+.btn-full-cobalt:hover { background: #1a3f94; }
+
+.btn-row { display: flex; gap: 10px; }
+.btn-ghost {
+  flex: 1; padding: 12px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 14px; color: var(--ink-3);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all .15s;
+}
+.btn-ghost:hover { border-color: var(--ink-3); color: var(--ink); }
+
+/* ═══════════════════════════════════════════════════════════
+   PATIENT DETAIL PANEL (inside modal)
+═══════════════════════════════════════════════════════════ */
+.patient-hero {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px; background: var(--surface);
+  border-radius: var(--radius-sm); margin-bottom: 16px;
+}
+.patient-avatar-lg {
+  width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(135deg, #c0392b, #5c3fa0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.patient-hero-name { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.patient-hero-phone { font-size: 12px; color: var(--ink-4); margin-bottom: 8px; }
+
+.obstetric-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.obs-chip {
+  padding: 3px 9px; border-radius: 20px;
+  background: var(--white); border: 1px solid var(--border);
+  font-size: 11px; font-weight: 500; color: var(--ink-2);
+}
+
+.risk-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.risk-tag {
+  padding: 3px 8px; border-radius: 4px;
+  background: #fde8e7; color: var(--crimson);
+  font-size: 11px; font-weight: 600;
+}
+
+.test-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.test-row:last-child { border-bottom: none; }
+.test-icon { font-size: 18px; flex-shrink: 0; }
+.test-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.test-code { font-size: 11px; font-family: monospace; color: var(--ink-4); }
+
+/* ═══════════════════════════════════════════════════════════
+   UPLOAD RESULTS PANEL
+═══════════════════════════════════════════════════════════ */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 32px; text-align: center;
+  cursor: pointer; transition: all .2s;
+  margin-bottom: 16px;
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--amber); background: var(--amber-l); }
+.upload-icon { font-size: 36px; margin-bottom: 12px; }
+.upload-label { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.upload-sub { font-size: 12px; color: var(--ink-4); margin-top: 4px; }
+
+.upload-action-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+}
+
+.upload-action-btn {
+  padding: 14px 12px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--white);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer; transition: all .2s; font-family: var(--font-body);
+}
+.upload-action-btn:hover { border-color: var(--amber); background: var(--amber-l); }
+.upload-action-btn span { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.upload-action-icon { font-size: 22px; }
+
+.file-preview-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.file-preview-thumb {
+  width: 40px; height: 40px; border-radius: 6px;
+  object-fit: cover; background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.file-preview-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.file-preview-size { font-size: 11px; color: var(--ink-4); }
+.file-remove {
+  margin-left: auto; width: 22px; height: 22px;
+  border-radius: 50%; background: #fde8e7; color: var(--crimson);
+  font-size: 12px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; flex-shrink: 0;
+}
+
+.notes-textarea {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--ink); resize: vertical; min-height: 80px;
+  outline: none; transition: border-color .15s; font-family: var(--font-body);
+}
+.notes-textarea:focus { border-color: var(--amber); }
+
+/* ═══════════════════════════════════════════════════════════
+   PATIENT INTERFACE
+═══════════════════════════════════════════════════════════ */
+.appointment-hero {
+  background: linear-gradient(135deg, var(--crimson) 0%, #8B0000 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  color: white; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.appointment-hero::before {
+  content: ''; position: absolute;
+  right: -30px; top: -30px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.appointment-hero::after {
+  content: ''; position: absolute;
+  right: 40px; bottom: -50px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.appt-status { font-size: 11px; font-weight: 600; letter-spacing: .8px; opacity: .8; margin-bottom: 8px; text-transform: uppercase; }
+.appt-hospital { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.appt-address { font-size: 13px; opacity: .8; margin-bottom: 20px; }
+.appt-datetime {
+  display: flex; gap: 20px;
+}
+.appt-dt-item { display: flex; flex-direction: column; }
+.appt-dt-label { font-size: 11px; opacity: .7; }
+.appt-dt-val { font-size: 16px; font-weight: 700; }
+
+.token-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px; text-align: center; margin-bottom: 16px;
+}
+.token-label { font-size: 12px; font-weight: 600; color: var(--ink-4); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 16px; }
+
+.qr-box {
+  width: 160px; height: 160px;
+  margin: 0 auto 16px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  background: white;
+}
+
+.qr-pattern {
+  display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px;
+  padding: 10px; width: 100%;
+}
+.qr-cell { aspect-ratio: 1; border-radius: 1px; }
+.qr-cell.b { background: var(--ink); }
+.qr-cell.w { background: white; }
+
+.slot-token {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 800; color: var(--ink); letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.token-ref { font-size: 11px; color: var(--ink-4); font-family: monospace; }
+
+.nav-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.nav-btn {
+  padding: 16px 12px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; transition: all .2s;
+  background: var(--white); font-family: var(--font-body);
+}
+.nav-btn:hover { border-color: var(--crimson); background: var(--crimson-l); transform: translateY(-2px); }
+.nav-btn-icon { font-size: 24px; }
+.nav-btn-label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+.bring-list {
+  list-style: none; display: flex; flex-direction: column; gap: 10px;
+}
+.bring-list li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); }
+.bring-list li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 14px; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   ASHA WORKER
+═══════════════════════════════════════════════════════════ */
+.screening-form { display: flex; flex-direction: column; gap: 14px; }
+
+.risk-factors-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+
+.risk-factor-check {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px; border-radius: 8px;
+  border: 1.5px solid var(--border); cursor: pointer;
+  transition: all .15s;
+}
+.risk-factor-check:hover { border-color: var(--crimson); background: var(--crimson-l); }
+.risk-factor-check input { display: none; }
+.risk-factor-check.checked { border-color: var(--crimson); background: var(--crimson-l); }
+.rf-icon { font-size: 16px; }
+.rf-label { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+
+.risk-indicator {
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; gap: 12px;
+  transition: all .3s;
+}
+.risk-indicator.low    { background: var(--green-l); border: 1.5px solid #bbddc9; }
+.risk-indicator.medium { background: var(--amber-l); border: 1.5px solid #f5d48e; }
+.risk-indicator.high   { background: var(--crimson-l); border: 1.5px solid #f5c0ba; }
+.risk-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.risk-dot.low { background: var(--green); }
+.risk-dot.medium { background: var(--amber); }
+.risk-dot.high { background: var(--crimson); }
+.risk-text { font-size: 13px; font-weight: 600; }
+.risk-text.low { color: var(--green); }
+.risk-text.medium { color: var(--amber); }
+.risk-text.high { color: var(--crimson); }
+
+/* ═══════════════════════════════════════════════════════════
+   ROUTING ANIMATION
+═══════════════════════════════════════════════════════════ */
+.routing-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(15,17,23,.85);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+}
+.routing-overlay.show { display: flex; }
+
+.routing-spinner {
+  width: 60px; height: 60px;
+  border: 4px solid rgba(255,255,255,.2);
+  border-top-color: var(--crimson);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.routing-text {
+  color: white; font-size: 18px; font-weight: 600; text-align: center;
+}
+.routing-subtext { color: rgba(255,255,255,.6); font-size: 13px; text-align: center; }
+
+.routing-steps {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 10px;
+}
+.routing-step {
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,.4); font-size: 13px;
+  transition: all .3s;
+}
+.routing-step.done { color: rgba(255,255,255,.9); }
+.routing-step.active { color: white; }
+.rs-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.2); flex-shrink: 0;
+  transition: all .3s;
+}
+.routing-step.done .rs-dot { background: #4caf50; }
+.routing-step.active .rs-dot { background: var(--crimson); box-shadow: 0 0 0 3px rgba(192,57,43,.3); animation: pulse 1s infinite; }
+
+/* ═══════════════════════════════════════════════════════════
+   SUCCESS TOAST
+═══════════════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 3000;
+  background: var(--ink); color: white;
+  padding: 14px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(100px); opacity: 0;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  max-width: 360px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   QUOTA TRACKER
+═══════════════════════════════════════════════════════════ */
+.quota-bar-wrap { margin-bottom: 16px; }
+.quota-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.quota-bar-label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.quota-bar-val { font-size: 13px; font-weight: 700; color: var(--ink); }
+.quota-bar {
+  height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+}
+.quota-fill {
+  height: 100%; border-radius: 4px;
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+
+/* Animations */
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes pulse   { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+
+/* Pages */
+.page { display: none; animation: fadeUp .3s ease; }
+.page.active { display: block; }
+
+/* Notification badge */
+.notif-dot {
+  width: 7px; height: 7px;
+  background: var(--crimson); border-radius: 50%;
+  display: inline-block; margin-left: 4px;
+  animation: pulse 2s infinite;
+}
+
+/* Section divider */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* Chip row */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  background: var(--cobalt-l); color: var(--cobalt);
+}
+
+/* Result file card */
+.result-file-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.result-file-icon { font-size: 28px; flex-shrink: 0; }
+.result-file-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.result-file-meta { font-size: 11px; color: var(--ink-4); }
+.result-file-badge {
+  margin-left: auto; padding: 4px 10px;
+  background: var(--green-l); color: var(--green);
+  border-radius: 20px; font-size: 11px; font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.timeline-item { display: flex; gap: 12px; }
+.timeline-line-col { display: flex; flex-direction: column; align-items: center; }
+.timeline-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+}
+.timeline-line { width: 2px; flex: 1; background: var(--border); margin: 4px 0; min-height: 20px; }
+.timeline-content { padding-bottom: 16px; }
+.timeline-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+.timeline-time  { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 40px 20px;
+  color: var(--ink-4);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--ink-3); margin-bottom: 6px; }
+.empty-sub   { font-size: 13px; color: var(--ink-4); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════════════════════ -->
+<div id="shell">
+  <div class="shell-bg"></div>
+  <div class="shell-grid"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🤱</div>
+      <div class="login-logo-text">
+        <h1>HRP Triage</h1>
+        <p>PPP Maternal Health Referral System · India</p>
+      </div>
+    </div>
+
+    <p class="login-heading">Select your role to continue</p>
+
+    <div class="role-grid">
+      <button class="role-btn" data-role="asha" onclick="selectRole(this)">
+        <span class="role-btn-icon">👩‍⚕️</span>
+        <span class="role-btn-label">ASHA / ANM</span>
+        <span class="role-btn-sub">Frontline Worker</span>
+      </button>
+      <button class="role-btn" data-role="govt" onclick="selectRole(this)">
+        <span class="role-btn-icon">🏥</span>
+        <span class="role-btn-label">Govt Doctor</span>
+        <span class="role-btn-sub">District Hospital</span>
+      </button>
+      <button class="role-btn" data-role="private" onclick="selectRole(this)">
+        <span class="role-btn-icon">🏨</span>
+        <span class="role-btn-label">Private Hospital</span>
+        <span class="role-btn-sub">PPP Partner</span>
+      </button>
+      <button class="role-btn" data-role="patient" onclick="selectRole(this)">
+        <span class="role-btn-icon">🤰</span>
+        <span class="role-btn-label">Patient</span>
+        <span class="role-btn-sub">Pregnant Woman</span>
+      </button>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Phone / User ID</label>
+      <input class="form-input" id="login-phone" type="text" placeholder="e.g. 9876543210" value="9876543210">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Password / OTP</label>
+      <input class="form-input" id="login-pass" type="password" placeholder="••••••••" value="demo1234">
+    </div>
+
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <p class="demo-hint">Demo credentials pre-filled · Select a role above to explore</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════════════════ -->
+<div id="app">
+  <!-- Top nav -->
+  <nav class="topnav">
+    <span class="topnav-logo">HRP Triage</span>
+    <span class="topnav-role" id="nav-role-badge"></span>
+    <span class="topnav-spacer"></span>
+    <div class="topnav-user">
+      <div class="topnav-avatar" id="nav-avatar"></div>
+      <span class="topnav-name" id="nav-username"></span>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Tab bar -->
+  <div class="tabbar" id="tabbar"></div>
+
+  <!-- Page area -->
+  <div class="page-area" id="page-area"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL
+════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-subtitle" id="modal-subtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Routing overlay -->
+<div class="routing-overlay" id="routing-overlay">
+  <div class="routing-spinner"></div>
+  <div class="routing-text">AI Routing Engine Active</div>
+  <div class="routing-subtext">Finding nearest available private partner...</div>
+  <div class="routing-steps">
+    <div class="routing-step" id="rs1"><div class="rs-dot"></div>Loading geospatial index</div>
+    <div class="routing-step" id="rs2"><div class="rs-dot"></div>Checking quota availability</div>
+    <div class="routing-step" id="rs3"><div class="rs-dot"></div>Scoring candidates by distance + quota</div>
+    <div class="routing-step" id="rs4"><div class="rs-dot"></div>Reserving quota slot</div>
+    <div class="routing-step" id="rs5"><div class="rs-dot"></div>Generating patient token</div>
+    <div class="routing-step" id="rs6"><div class="rs-dot"></div>Sending SMS notification</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   MOCK DATA
+═══════════════════════════════════════════════════════════ */
+const MOCK = {
+  referrals: [
+    {
+      id: 'REF-001', token: 'a3f8c1d2', status: 'pending_govt',
+      patient: { name: 'Sunita Devi', phone: '9870012345', age: 24, riskLevel: 'high',
+        riskFactors: ['Anaemia (Hb<7)', 'Hypertension', 'Previous C-Section'],
+        obstetric: { gravida: 3, para: 2, edd: '15 Aug 2025', lmp: '8 Nov 2024' }
+      },
+      requiredTests: [
+        { code: 'USG_ANOMALY', name: 'Anomaly Scan (18-20 wks)', urgency: 'urgent' },
+        { code: 'HB_ELECTRO',  name: 'Haemoglobin Electrophoresis', urgency: 'routine' }
+      ],
+      initiatedBy: 'ASHA Meera Singh', createdAt: '2 hrs ago', district: 'Varanasi'
+    },
+    {
+      id: 'REF-002', token: 'b7e2a4f9', status: 'pending_govt',
+      patient: { name: 'Radha Kumari', phone: '9812345670', age: 31, riskLevel: 'high',
+        riskFactors: ['Gestational Diabetes', 'Oligohydramnios'],
+        obstetric: { gravida: 2, para: 1, edd: '22 Jul 2025', lmp: '15 Oct 2024' }
+      },
+      requiredTests: [
+        { code: 'GTT',       name: 'Glucose Tolerance Test', urgency: 'urgent' },
+        { code: 'AFI_USG',  name: 'Amniotic Fluid Index USG', urgency: 'urgent' }
+      ],
+      initiatedBy: 'ANM Priya Verma', createdAt: '4 hrs ago', district: 'Varanasi'
+    },
+    {
+      id: 'REF-003', token: 'c9d1b5e0', status: 'routed_private',
+      patient: { name: 'Lakshmi Bai', phone: '9834561230', age: 19, riskLevel: 'high',
+        riskFactors: ['Teenage Pregnancy', 'Severe Anaemia'],
+        obstetric: { gravida: 1, para: 0, edd: '10 Sep 2025', lmp: '3 Dec 2024' }
+      },
+      requiredTests: [
+        { code: 'USG_DATING', name: 'Dating & Viability Scan', urgency: 'routine' },
+        { code: 'IRON_STUDY', name: 'Iron Studies Panel', urgency: 'urgent' }
+      ],
+      initiatedBy: 'ASHA Sita Ram', createdAt: '1 day ago', district: 'Varanasi',
+      assignedHospital: 'Sunrise Diagnostics & Maternity', assignedAt: '23 hrs ago',
+      appointment: { date: '18 Jan 2025', time: '10:00 AM', slotToken: 'HRP-007' }
+    },
+    {
+      id: 'REF-004', token: 'd2e7f3a1', status: 'tests_completed',
+      patient: { name: 'Parvati Yadav', phone: '9856781234', age: 28, riskLevel: 'medium',
+        riskFactors: ['Hypothyroidism', 'Previous Abortion'],
+        obstetric: { gravida: 3, para: 1, edd: '5 Oct 2025', lmp: '28 Dec 2024' }
+      },
+      requiredTests: [
+        { code: 'TSH_FT4', name: 'TSH + Free T4', urgency: 'routine' }
+      ],
+      initiatedBy: 'ANM Kavita Mishra', createdAt: '3 days ago', district: 'Varanasi',
+      assignedHospital: 'Apollo Clinic Varanasi', assignedAt: '2 days ago',
+      results: [{ name: 'TSH_FT4_Report.pdf', type: 'pdf', uploadedAt: '5 hrs ago', test: 'TSH + Free T4' }]
+    }
+  ],
+
+  privateQueue: [
+    {
+      id: 'REF-003', token: 'c9d1b5e0', status: 'routed_private',
+      patient: { name: 'Lakshmi Bai', phone: '9834561230', age: 19, riskLevel: 'high',
+        riskFactors: ['Teenage Pregnancy', 'Severe Anaemia'],
+        obstetric: { gravida: 1, para: 0, edd: '10 Sep 2025' }
+      },
+      requiredTests: [
+        { code: 'USG_DATING', name: 'Dating & Viability Scan', urgency: 'routine' },
+        { code: 'IRON_STUDY', name: 'Iron Studies Panel', urgency: 'urgent' }
+      ],
+      slotToken: 'HRP-007', appointment: '18 Jan 2025 · 10:00 AM',
+      originHospital: 'District Women\'s Hospital, Varanasi'
+    },
+    {
+      id: 'REF-005', token: 'e4a8b2c6', status: 'routed_private',
+      patient: { name: 'Geeta Pandey', phone: '9867452301', age: 33, riskLevel: 'medium',
+        riskFactors: ['Advanced Maternal Age', 'Twins'],
+        obstetric: { gravida: 1, para: 0, edd: '30 Jul 2025' }
+      },
+      requiredTests: [
+        { code: 'DUAL_MARKER', name: 'Dual Marker Test', urgency: 'urgent' },
+        { code: 'NT_USG', name: 'NT Scan (11-14 wks)', urgency: 'urgent' }
+      ],
+      slotToken: 'HRP-008', appointment: '19 Jan 2025 · 11:30 AM',
+      originHospital: 'CHC Ramnagar, Varanasi'
+    }
+  ],
+
+  patient: {
+    name: 'Sunita Devi', phone: '9870012345', token: 'HRP-007',
+    refToken: 'a3f8c1d2-0000-0000',
+    appointment: {
+      hospital: 'Sunrise Diagnostics & Maternity',
+      address: 'Orderly Bazar, Near Kabir Chowk, Varanasi',
+      date: 'Tuesday, 18 January 2025', time: '10:00 AM',
+      tests: ['Dating & Viability Scan', 'Iron Studies Panel'],
+      status: 'Appointment Confirmed'
+    }
+  },
+
+  quota: {
+    total: 50, used: 31, reset: '01 Feb 2025',
+    byTest: [
+      { name: 'Ultrasound Scans', used: 18, total: 20 },
+      { name: 'Blood Tests',      used: 9,  total: 15 },
+      { name: 'Specialized Tests',used: 4,  total: 15 }
+    ]
+  },
+
+  ashaPatients: [
+    { name: 'Sunita Devi',   phone: '9870012345', weeks: 18, status: 'referred',    risk: 'high' },
+    { name: 'Meena Sharma',  phone: '9812001234', weeks: 12, status: 'registered',  risk: 'low' },
+    { name: 'Usha Gupta',    phone: '9845678901', weeks: 28, status: 'follow-up',   risk: 'medium' },
+    { name: 'Champa Devi',   phone: '9867123400', weeks: 8,  status: 'new',         risk: 'low' }
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════
+   STATE & ROUTING
+═══════════════════════════════════════════════════════════ */
+let currentRole = null;
+let currentTab  = null;
+
+const ROLES = {
+  asha:    { label: 'ASHA/ANM Worker', color: '#0d7a6e', bg: '#e6f4f2', name: 'Meera Singh',    initial: 'M' },
+  govt:    { label: 'Govt Doctor',     color: '#2354b8', bg: '#edf1fb', name: 'Dr. R. Sharma', initial: 'R' },
+  private: { label: 'Private Partner', color: '#d4750a', bg: '#fef6e6', name: 'Sunrise Dx',    initial: 'S' },
+  patient: { label: 'Patient',         color: '#c0392b', bg: '#fdf0ee', name: 'Sunita Devi',   initial: 'S' }
+};
+
+const TABS = {
+  asha:    [
+    { id: 'asha-dashboard', label: 'Dashboard' },
+    { id: 'asha-patients',  label: 'My Patients' },
+    { id: 'asha-newhrp',    label: '+ Flag HRP', badge: null }
+  ],
+  govt:    [
+    { id: 'govt-dashboard', label: 'Dashboard' },
+    { id: 'govt-referrals', label: 'Referrals', badge: 2 },
+    { id: 'govt-results',   label: 'Results Inbox', badge: 1 },
+    { id: 'govt-capacity',  label: 'Capacity' }
+  ],
+  private: [
+    { id: 'priv-dashboard', label: 'Dashboard' },
+    { id: 'priv-queue',     label: 'Cases Queue', badge: 2 },
+    { id: 'priv-quota',     label: 'Quota Tracker' }
+  ],
+  patient: [
+    { id: 'pat-home',       label: 'My Appointment' },
+    { id: 'pat-token',      label: 'My Token' },
+    { id: 'pat-results',    label: 'My Results' }
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════ */
+function selectRole(btn) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRole = btn.dataset.role;
+}
+
+function doLogin() {
+  if (!currentRole) { showToast('⚠ Please select a role first', '⚠'); return; }
+  document.getElementById('shell').style.display = 'none';
+  const app = document.getElementById('app');
+  app.classList.add('active');
+
+  const r = ROLES[currentRole];
+  const badge = document.getElementById('nav-role-badge');
+  badge.textContent = r.label;
+  badge.style.background = r.bg;
+  badge.style.color = r.color;
+
+  const av = document.getElementById('nav-avatar');
+  av.textContent = r.initial;
+  av.style.background = r.color;
+  document.getElementById('nav-username').textContent = r.name;
+
+  buildTabs();
+  switchTab(TABS[currentRole][0].id);
+}
+
+function doLogout() {
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('shell').style.display = 'flex';
+  document.getElementById('page-area').innerHTML = '';
+  document.getElementById('tabbar').innerHTML = '';
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  currentRole = null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB / ROUTING
+═══════════════════════════════════════════════════════════ */
+function buildTabs() {
+  const bar = document.getElementById('tabbar');
+  bar.innerHTML = TABS[currentRole].map(t => `
+    <div class="tab-item" id="tab-${t.id}" onclick="switchTab('${t.id}')">
+      ${t.label}
+      ${t.badge ? `<span class="tab-badge">${t.badge}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function switchTab(id) {
+  currentTab = id;
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + id);
+  if (tabEl) tabEl.classList.add('active');
+  renderPage(id);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE RENDERERS
+═══════════════════════════════════════════════════════════ */
+function renderPage(id) {
+  const area = document.getElementById('page-area');
+  const renderers = {
+    // ── ASHA ──
+    'asha-dashboard': renderAshaDashboard,
+    'asha-patients':  renderAshaPatients,
+    'asha-newhrp':    renderAshaNewHRP,
+    // ── GOVT ──
+    'govt-dashboard': renderGovtDashboard,
+    'govt-referrals': renderGovtReferrals,
+    'govt-results':   renderGovtResults,
+    'govt-capacity':  renderGovtCapacity,
+    // ── PRIVATE ──
+    'priv-dashboard': renderPrivDashboard,
+    'priv-queue':     renderPrivQueue,
+    'priv-quota':     renderPrivQuota,
+    // ── PATIENT ──
+    'pat-home':       renderPatHome,
+    'pat-token':      renderPatToken,
+    'pat-results':    renderPatResults
+  };
+  area.innerHTML = '';
+  if (renderers[id]) renderers[id](area);
+}
+
+/* ───────────────────────────────────────────────────────
+   ASHA PAGES
+─────────────────────────────────────────────────────── */
+function renderAshaDashboard(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">My Dashboard</div>
+        <div class="page-subtitle">Meera Singh · Kabir Nagar Block, Varanasi</div>
+      </div>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card">
+        <div class="stat-label">My Patients</div>
+        <div class="stat-value">14</div>
+        <div class="stat-delta">▲ 2 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">HRP Flagged</div>
+        <div class="stat-value" style="color:var(--crimson)">4</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Referred</div>
+        <div class="stat-value" style="color:var(--cobalt)">3</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recent Activity</div>
+      <div class="timeline">
+        ${[
+          ['Sunita Devi routed to Sunrise Diagnostics', '2 hrs ago', 'routed_private'],
+          ['Lakshmi Bai flagged as High Risk', '1 day ago', 'high'],
+          ['Radha Kumari — referral pending govt', '4 hrs ago', 'pending_govt'],
+          ['Meena Sharma ANC visit recorded', '2 days ago', 'low']
+        ].map(([t,d,s], i, arr) => `
+          <div class="timeline-item">
+            <div class="timeline-line-col">
+              <div class="timeline-dot" style="background:${s==='routed_private'?'var(--violet)':s==='high'?'var(--crimson)':s==='pending_govt'?'var(--amber)':'var(--green)'}"></div>
+              ${i<arr.length-1?'<div class="timeline-line"></div>':''}
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-label">${t}</div>
+              <div class="timeline-time">${d}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Quick Actions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="upload-action-btn" onclick="switchTab('asha-newhrp')"><span class="upload-action-icon">🚩</span><span>Flag New HRP</span></button>
+        <button class="upload-action-btn" onclick="switchTab('asha-patients')"><span class="upload-action-icon">👥</span><span>View Patients</span></button>
+      </div>
+    </div>
+  `;
+}
+
+function renderAshaPatients(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">My Patients</div><div class="page-subtitle">14 registered patients</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="ref-table">
+        <thead><tr>
+          <th>Patient</th><th>Weeks</th><th>Status</th><th>Risk</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${MOCK.ashaPatients.map(p=>`
+            <tr>
+              <td><div class="patient-cell">
+                <div class="patient-avatar-sm">${p.name[0]}</div>
+                <div><div class="patient-name-sm">${p.name}</div><div class="patient-meta-sm">${p.phone}</div></div>
+              </div></td>
+              <td><span style="font-weight:600">${p.weeks}</span> wks</td>
+              <td><span class="badge badge-${p.status==='referred'?'routed':p.status==='new'?'pending':'accepted'}">${p.status}</span></td>
+              <td><span class="badge badge-${p.risk}">${p.risk.toUpperCase()}</span></td>
+              <td><div class="action-row">
+                <button class="btn-sm btn-view" onclick="showToast('Opening patient profile...')">View</button>
+                ${p.risk!=='low'?`<button class="btn-sm btn-reject" onclick="switchTab('asha-newhrp')">+ HRP</button>`:''}
+              </div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAshaNewHRP(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Flag High-Risk Pregnancy</div><div class="page-subtitle">Complete screening form to initiate referral</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Patient Details</div>
+      <div class="screening-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" value="Sunita Devi"></div>
+          <div class="form-field"><label class="form-label">Phone</label><input class="form-input" value="9870012345"></div>
+          <div class="form-field"><label class="form-label">Age</label><input class="form-input" value="24" type="number"></div>
+          <div class="form-field"><label class="form-label">LMP Date</label><input class="form-input" type="date" value="2024-11-08"></div>
+          <div class="form-field"><label class="form-label">Gravida</label><input class="form-input" value="3" type="number"></div>
+          <div class="form-field"><label class="form-label">Para</label><input class="form-input" value="2" type="number"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Risk Factor Screening</div>
+      <div class="risk-factors-grid" id="rf-grid">
+        ${[
+          ['🩸','Severe Anaemia (Hb<7)','anaemia'],
+          ['💉','Hypertension / Pre-eclampsia','htn'],
+          ['🍬','Gestational Diabetes','gdm'],
+          ['🔪','Previous C-Section','prev_cs'],
+          ['👶','Previous Stillbirth','stillbirth'],
+          ['⚖️','Multiple Pregnancy','multip'],
+          ['🫀','Cardiac Disease','cardiac'],
+          ['🦋','Thyroid Disorder','thyroid'],
+          ['📊','Abnormal Presentation','abnorm'],
+          ['👩','Age <18 or >35','age_risk']
+        ].map(([icon,label,key])=>`
+          <label class="risk-factor-check" onclick="toggleRF(this)" data-key="${key}">
+            <input type="checkbox"><span class="rf-icon">${icon}</span><span class="rf-label">${label}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div style="margin-top:16px">
+        <div class="risk-indicator low" id="risk-ind">
+          <div class="risk-dot low" id="risk-dot"></div>
+          <div class="risk-text low" id="risk-text">Low Risk · No flags selected</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="tests-card" style="display:none">
+      <div class="card-title">Recommended Tests</div>
+      <div id="recommended-tests"></div>
+    </div>
+    <button class="btn-full btn-full-red" id="submit-hrp-btn" style="display:none" onclick="submitHRP()">
+      🚩 Submit HRP Referral to District Hospital
+    </button>
+  `;
+}
+
+function toggleRF(el) {
+  el.classList.toggle('checked');
+  updateRiskScore();
+}
+
+function updateRiskScore() {
+  const checked = document.querySelectorAll('.risk-factor-check.checked').length;
+  const ind = document.getElementById('risk-ind');
+  const dot = document.getElementById('risk-dot');
+  const txt = document.getElementById('risk-text');
+  const testsCard = document.getElementById('tests-card');
+  const submitBtn = document.getElementById('submit-hrp-btn');
+  const recs = document.getElementById('recommended-tests');
+
+  let level = 'low', msg = 'Low Risk · No significant flags';
+  if (checked >= 2) { level = 'high';   msg = `High Risk · ${checked} flags detected — Immediate referral recommended`; }
+  else if (checked === 1) { level = 'medium'; msg = '1 risk factor detected — Monitoring advised'; }
+
+  ind.className = `risk-indicator ${level}`;
+  dot.className = `risk-dot ${level}`;
+  txt.className = `risk-text ${level}`;
+  txt.textContent = msg;
+
+  if (checked >= 1) {
+    testsCard.style.display = 'block';
+    submitBtn.style.display = 'block';
+    const tests = [
+      { code: 'USG_ANOMALY', name: 'Anomaly Scan (18-20 wks)', urgency: 'urgent' },
+      { code: 'HB_ELECTRO',  name: 'Haemoglobin Electrophoresis', urgency: 'routine' }
+    ];
+    if (checked >= 2) tests.push({ code: 'ECHO_FOETAL', name: 'Foetal ECHO', urgency: 'urgent' });
+    recs.innerHTML = tests.map(t=>`
+      <div class="test-row">
+        <span class="test-icon">🔬</span>
+        <div style="flex:1"><div class="test-name">${t.name}</div><div class="test-code">${t.code}</div></div>
+        <span class="badge badge-${t.urgency}">${t.urgency.toUpperCase()}</span>
+      </div>
+    `).join('');
+  } else {
+    testsCard.style.display = 'none';
+    submitBtn.style.display = 'none';
+  }
+}
+
+function submitHRP() {
+  closeModal();
+  showToast('✅ HRP referral submitted to District Women\'s Hospital', '✅');
+  setTimeout(()=>{ switchTab('asha-dashboard'); }, 800);
+}
+
+/* ───────────────────────────────────────────────────────
+   GOVT PAGES
+─────────────────────────────────────────────────────── */
+function renderGovtDashboard(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Hospital Dashboard</div><div class="page-subtitle">District Women's Hospital · Varanasi</div></div>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="stat-label">Pending Referrals</div>
+        <div class="stat-value" style="color:var(--crimson)">2</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Accepted Today</div>
+        <div class="stat-value" style="color:var(--cobalt)">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Routed to Private</div>
+        <div class="stat-value" style="color:var(--violet)">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Results Awaited</div>
+        <div class="stat-value" style="color:var(--amber)">2</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Urgent — Pending Action</div>
+      ${MOCK.referrals.filter(r=>r.status==='pending_govt').map(r=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div class="patient-avatar-lg">${r.patient.name[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:14px">${r.patient.name}</div>
+            <div style="font-size:12px;color:var(--ink-4)">${r.requiredTests.map(t=>t.name).join(' · ')}</div>
+          </div>
+          <span class="badge badge-high">HIGH RISK</span>
+          <button class="btn-sm btn-view" onclick="openReferralModal('${r.id}')">Review</button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">OPD Capacity</div>
+      <div class="quota-bar-wrap">
+        <div class="quota-bar-header"><span class="quota-bar-label">OPD Beds Available</span><span class="quota-bar-val">12 / 30</span></div>
+        <div class="quota-bar"><div class="quota-fill" style="width:40%;background:var(--amber)"></div></div>
+      </div>
+      <div class="quota-bar-wrap">
+        <div class="quota-bar-header"><span class="quota-bar-label">Ultrasound Machine</span><span class="quota-bar-val" style="color:var(--crimson)">OFFLINE</span></div>
+        <div class="quota-bar"><div class="quota-fill" style="width:0%;background:var(--crimson)"></div></div>
+      </div>
+      <div class="quota-bar-wrap">
+        <div class="quota-bar-header"><span class="quota-bar-label">Lab Capacity</span><span class="quota-bar-val">8 / 20 slots</span></div>
+        <div class="quota-bar"><div class="quota-fill" style="width:40%;background:var(--green)"></div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGovtReferrals(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Incoming Referrals</div><div class="page-subtitle">Showing all HRP cases</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="ref-table">
+        <thead><tr>
+          <th>Patient</th><th>Tests Required</th><th>Urgency</th><th>Status</th><th>Received</th><th>Action</th>
+        </tr></thead>
+        <tbody>
+          ${MOCK.referrals.map(r=>`
+            <tr>
+              <td><div class="patient-cell">
+                <div class="patient-avatar-sm">${r.patient.name[0]}</div>
+                <div>
+                  <div class="patient-name-sm">${r.patient.name}</div>
+                  <div class="patient-meta-sm">${r.patient.phone} · ${r.patient.age}y</div>
+                </div>
+              </div></td>
+              <td>
+                <div style="font-size:12px;color:var(--ink-2)">${r.requiredTests.map(t=>t.name).join('<br>')}</div>
+              </td>
+              <td><span class="badge badge-${r.requiredTests.some(t=>t.urgency==='urgent')?'urgent':'routine'}">${r.requiredTests.some(t=>t.urgency==='urgent')?'URGENT':'ROUTINE'}</span></td>
+              <td><span class="badge badge-${r.status==='pending_govt'?'pending':r.status==='routed_private'?'routed':'done'}">${r.status.replace('_',' ')}</span></td>
+              <td style="font-size:12px;color:var(--ink-4)">${r.createdAt}</td>
+              <td><div class="action-row">
+                <button class="btn-sm btn-view" onclick="openReferralModal('${r.id}')">Review</button>
+                ${r.status==='pending_govt'?`
+                  <button class="btn-sm btn-accept" onclick="openDecisionModal('${r.id}')">Decide</button>
+                `:''}
+              </div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderGovtResults(area) {
+  const done = MOCK.referrals.filter(r=>r.results);
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Test Results Inbox</div><div class="page-subtitle">Uploaded by private partner hospitals</div></div>
+    </div>
+    ${done.length === 0 ? '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No results yet</div></div>' :
+      done.map(r=>`
+        <div class="card">
+          <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">
+            <div class="patient-avatar-lg">${r.patient.name[0]}</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:15px">${r.patient.name}</div>
+              <div style="font-size:12px;color:var(--ink-4)">from ${r.assignedHospital || 'Partner Hospital'} · ${r.results[0].uploadedAt}</div>
+            </div>
+            <span class="badge badge-done">RESULTS READY</span>
+          </div>
+          ${r.results.map(f=>`
+            <div class="result-file-card">
+              <div class="result-file-icon">${f.type==='pdf'?'📄':'🖼'}</div>
+              <div>
+                <div class="result-file-name">${f.name}</div>
+                <div class="result-file-meta">${f.test} · Uploaded ${f.uploadedAt}</div>
+              </div>
+              <button class="result-file-badge" onclick="showToast('Opening ${f.name}...')">View Report</button>
+            </div>
+          `).join('')}
+          <div class="btn-row" style="margin-top:12px">
+            <button class="btn-ghost" onclick="showToast('Marked as reviewed')">Mark Reviewed</button>
+            <button class="btn-full btn-full-cobalt" style="flex:2" onclick="showToast('Booking follow-up appointment...')">Schedule Follow-up</button>
+          </div>
+        </div>
+      `).join('')
+    }
+  `;
+}
+
+function renderGovtCapacity(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Hospital Capacity</div><div class="page-subtitle">Manage beds, equipment and slots</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Current Bed Status</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        ${[['Maternity Ward','18','30'],['ANC OPD','12','20'],['Labour Room','4','8'],['NICU','6','10']].map(([n,u,t])=>`
+          <div style="padding:14px;border:1px solid var(--border);border-radius:8px">
+            <div style="font-size:12px;color:var(--ink-4);margin-bottom:6px">${n}</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:700">${u}<span style="font-size:14px;color:var(--ink-4);font-family:var(--font-body)"> / ${t}</span></div>
+            <div class="quota-bar" style="margin-top:8px"><div class="quota-fill" style="width:${Math.round(u/t*100)}%;background:${u/t>0.8?'var(--crimson)':u/t>0.5?'var(--amber)':'var(--green)'}"></div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Equipment Status</div>
+      ${[
+        ['Ultrasound Machine 1','OFFLINE','— Under maintenance'],
+        ['Ultrasound Machine 2','ONLINE','8 slots remaining today'],
+        ['Blood Analyzer','ONLINE','20 tests remaining'],
+        ['Foetal Doppler','ONLINE','Available']
+      ].map(([n,s,note])=>`
+        <div style="display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1;font-size:13px;font-weight:500">${n}</div>
+          <span style="font-size:12px;font-weight:600;color:${s==='ONLINE'?'var(--green)':'var(--crimson)'}">● ${s}</span>
+          <span style="font-size:11px;color:var(--ink-4);margin-left:12px">${note}</span>
+          <button class="btn-sm btn-view" style="margin-left:12px" onclick="showToast('Updating ${n}...')">Update</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ───────────────────────────────────────────────────────
+   PRIVATE PAGES
+─────────────────────────────────────────────────────── */
+function renderPrivDashboard(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Partner Dashboard</div><div class="page-subtitle">Sunrise Diagnostics & Maternity · Varanasi</div></div>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card">
+        <div class="stat-label">Cases This Month</div>
+        <div class="stat-value">31</div>
+        <div class="stat-delta">▲ 12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quota Remaining</div>
+        <div class="stat-value" style="color:var(--green)">19</div>
+        <div style="font-size:11px;color:var(--ink-4);margin-top:4px">resets 01 Feb</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Upload</div>
+        <div class="stat-value" style="color:var(--amber)">2</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Today's Schedule</div>
+      ${MOCK.privateQueue.map(r=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--crimson);width:60px;flex-shrink:0">${r.slotToken}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${r.patient.name}</div>
+            <div style="font-size:12px;color:var(--ink-4)">${r.requiredTests.map(t=>t.name).join(' · ')}</div>
+          </div>
+          <button class="btn-sm btn-upload" onclick="openUploadModal('${r.id}')">Upload Results</button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:10px">
+        <button class="btn-full btn-full-cobalt" onclick="showToast('Opening QR scanner...')">📷 Scan Patient QR</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPrivQueue(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Cases Queue</div><div class="page-subtitle">Routed from government hospitals</div></div>
+    </div>
+    ${MOCK.privateQueue.map(r=>`
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px">
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--crimson);background:var(--crimson-l);width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">${r.slotToken}</div>
+          <div style="flex:1">
+            <div style="font-size:17px;font-weight:700;margin-bottom:4px">${r.patient.name}
+              <span class="badge badge-high" style="margin-left:6px">${r.patient.riskLevel.toUpperCase()}</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink-4)">Age ${r.patient.age} · G${r.patient.obstetric.gravida}P${r.patient.obstetric.para || 0}</div>
+            <div style="font-size:12px;color:var(--ink-4);margin-top:2px">From: ${r.originHospital}</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="card-title">Required Tests</div>
+          ${r.requiredTests.map(t=>`
+            <div class="test-row">
+              <span class="test-icon">🔬</span>
+              <div style="flex:1"><div class="test-name">${t.name}</div><div class="test-code">${t.code}</div></div>
+              <span class="badge badge-${t.urgency}">${t.urgency.toUpperCase()}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-4);margin-bottom:14px">
+          🕐 Scheduled: <strong style="color:var(--ink-2)">${r.appointment}</strong>
+        </div>
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="showToast('Calling patient ${r.patient.phone}...')">📞 Call Patient</button>
+          <button class="btn-full btn-full-red" style="flex:2" onclick="openUploadModal('${r.id}')">📤 Upload Test Results</button>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderPrivQuota(area) {
+  const q = MOCK.quota;
+  const pct = Math.round(q.used / q.total * 100);
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">PPP Quota Tracker</div><div class="page-subtitle">Free test allocation under NHM scheme</div></div>
+    </div>
+    <div class="card">
+      <div style="text-align:center;padding:10px 0 20px">
+        <div style="font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--crimson)">${q.used}</div>
+        <div style="font-size:15px;color:var(--ink-3);margin-top:4px">of ${q.total} monthly free tests used</div>
+        <div style="font-size:12px;color:var(--ink-4);margin-top:6px">Resets on ${q.reset}</div>
+      </div>
+      <div class="quota-bar" style="height:12px;border-radius:6px;margin-bottom:8px">
+        <div class="quota-fill" style="width:${pct}%;background:${pct>80?'var(--crimson)':pct>60?'var(--amber)':'var(--green)'}"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-4)">
+        <span>${q.used} used</span><span>${q.total - q.used} remaining</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Breakdown by Test Type</div>
+      ${q.byTest.map(b=>`
+        <div class="quota-bar-wrap">
+          <div class="quota-bar-header">
+            <span class="quota-bar-label">${b.name}</span>
+            <span class="quota-bar-val">${b.used} / ${b.total}</span>
+          </div>
+          <div class="quota-bar">
+            <div class="quota-fill" style="width:${Math.round(b.used/b.total*100)}%;background:${b.used/b.total>0.85?'var(--crimson)':b.used/b.total>0.6?'var(--amber)':'var(--cobalt)'}"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Compliance Summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="padding:14px;border:1px solid var(--green);border-radius:8px;background:var(--green-l)">
+          <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:4px">Tests Performed</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--green)">31</div>
+        </div>
+        <div style="padding:14px;border:1px solid var(--border);border-radius:8px">
+          <div style="font-size:12px;color:var(--ink-4);font-weight:600;margin-bottom:4px">Reports Uploaded</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--cobalt)">29</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ───────────────────────────────────────────────────────
+   PATIENT PAGES
+─────────────────────────────────────────────────────── */
+function renderPatHome(area) {
+  const p = MOCK.patient;
+  area.innerHTML = `
+    <div class="page-header" style="margin-bottom:16px">
+      <div><div class="page-title">नमस्ते, ${p.name.split(' ')[0]} जी 👋</div></div>
+    </div>
+    <div class="appointment-hero">
+      <div class="appt-status">✅ APPOINTMENT CONFIRMED</div>
+      <div class="appt-hospital">${p.appointment.hospital}</div>
+      <div class="appt-address">${p.appointment.address}</div>
+      <div class="appt-datetime">
+        <div class="appt-dt-item"><span class="appt-dt-label">Date</span><span class="appt-dt-val">${p.appointment.date}</span></div>
+        <div class="appt-dt-item"><span class="appt-dt-label">Time</span><span class="appt-dt-val">${p.appointment.time}</span></div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn" onclick="showToast('Opening Google Maps...')">
+        <span class="nav-btn-icon">📍</span>
+        <span class="nav-btn-label">Get Directions</span>
+      </button>
+      <button class="nav-btn" onclick="showToast('Calling Sunrise Diagnostics...')">
+        <span class="nav-btn-icon">📞</span>
+        <span class="nav-btn-label">Call Hospital</span>
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-title">Tests Scheduled (FREE)</div>
+      ${p.appointment.tests.map(t=>`
+        <div class="test-row">
+          <span class="test-icon">🔬</span>
+          <div style="flex:1"><div class="test-name">${t}</div></div>
+          <span style="font-size:12px;font-weight:700;color:var(--green);background:var(--green-l);padding:3px 8px;border-radius:20px">निःशुल्क</span>
+        </div>
+      `).join('')}
+      <div style="margin-top:12px;padding:10px;background:var(--cobalt-l);border-radius:8px;font-size:12px;color:var(--cobalt)">
+        ℹ These tests are FREE under NHM High-Risk Pregnancy Scheme. No payment required.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">क्या लेकर आयें / What to Bring</div>
+      <ul class="bring-list">
+        <li>QR Code (अगली स्क्रीन पर / next tab)</li>
+        <li>Aadhaar Card or Voter ID</li>
+        <li>Previous medical records</li>
+        <li>ASHA worker's referral letter</li>
+      </ul>
+    </div>
+  `;
+}
+
+function renderPatToken(area) {
+  const p = MOCK.patient;
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">My Token</div><div class="page-subtitle">Show this at hospital reception</div></div>
+    </div>
+    <div class="token-card">
+      <div class="token-label">Your Appointment Token</div>
+      <div class="slot-token">${p.token}</div>
+      <div class="token-ref">Ref: ${p.refToken.toUpperCase()}</div>
+      <div class="qr-box" style="margin:20px auto">
+        ${generateQRPattern()}
+      </div>
+      <div style="font-size:12px;color:var(--ink-4);margin-top:8px;line-height:1.6">
+        यह QR code hospital reception पर दिखाएँ<br>
+        Show this QR at hospital reception for your <strong>FREE test</strong>
+      </div>
+    </div>
+    <div class="card" style="background:var(--green-l);border-color:#bbddc9">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="font-size:24px">✅</span>
+        <div>
+          <div style="font-weight:700;color:var(--green);margin-bottom:4px">Eligibility Verified</div>
+          <div style="font-size:13px;color:#145d31;line-height:1.6">
+            You are eligible for <strong>free tests</strong> under the NHM PPP High-Risk Pregnancy Scheme.
+            ${p.appointment.hospital} has ${MOCK.quota.total - MOCK.quota.used} slots remaining this month.
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-full btn-full-cobalt" style="margin-top:4px" onclick="showToast('Screenshot saved to gallery')">
+      📸 Save as Screenshot
+    </button>
+  `;
+}
+
+function renderPatResults(area) {
+  area.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">My Results</div><div class="page-subtitle">Test reports from partner hospital</div></div>
+    </div>
+    <div class="empty-state" style="padding:60px 20px">
+      <div class="empty-icon">🔬</div>
+      <div class="empty-title">Results Pending</div>
+      <div class="empty-sub">Your tests are scheduled for 18 Jan 2025.<br>Reports will appear here once uploaded.</div>
+    </div>
+    <div class="card" style="background:var(--amber-l);border-color:#f5d48e">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:20px">🔔</span>
+        <div style="font-size:13px;color:#633806;line-height:1.6">
+          You will receive an <strong>SMS notification</strong> when your reports are ready.
+          You can also check this tab after your appointment.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════════ */
+function openReferralModal(refId) {
+  const ref = MOCK.referrals.find(r=>r.id===refId) || MOCK.privateQueue.find(r=>r.id===refId);
+  if (!ref) return;
+  const p = ref.patient;
+
+  document.getElementById('modal-title').textContent = 'Referral Details';
+  document.getElementById('modal-subtitle').textContent = `REF ${ref.id} · ${ref.createdAt}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="patient-hero">
+      <div class="patient-avatar-lg">${p.name[0]}</div>
+      <div style="flex:1">
+        <div class="patient-hero-name">${p.name}</div>
+        <div class="patient-hero-phone">${p.phone} · Age ${p.age}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-${p.riskLevel}">${p.riskLevel.toUpperCase()} RISK</span>
+        </div>
+        <div class="obstetric-chips" style="margin-top:8px">
+          <span class="obs-chip">G${p.obstetric.gravida}P${p.obstetric.para}</span>
+          <span class="obs-chip">EDD: ${p.obstetric.edd}</span>
+          <span class="obs-chip">LMP: ${p.obstetric.lmp||'—'}</span>
+        </div>
+        <div class="risk-tags">
+          ${p.riskFactors.map(f=>`<span class="risk-tag">${f}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card-title" style="margin-top:4px">Required Tests</div>
+    ${ref.requiredTests.map(t=>`
+      <div class="test-row">
+        <span class="test-icon">🔬</span>
+        <div style="flex:1"><div class="test-name">${t.name}</div><div class="test-code">${t.code}</div></div>
+        <span class="badge badge-${t.urgency}">${t.urgency.toUpperCase()}</span>
+      </div>
+    `).join('')}
+    ${ref.status==='pending_govt'?`
+      <div class="divider"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="closeModal();openDecisionModal('${ref.id}')">Take Decision</button>
+        <button class="btn-full btn-full-cobalt" style="flex:2" onclick="closeModal();openDecisionModal('${ref.id}')">⚡ Accept / Route</button>
+      </div>
+    `:ref.status==='routed_private'?`
+      <div style="padding:12px;background:var(--violet-l);border-radius:8px;margin-top:12px;font-size:13px;color:var(--violet)">
+        ✅ Routed to <strong>${ref.assignedHospital}</strong> · Token: ${ref.appointment.slotToken} · ${ref.appointment.date} ${ref.appointment.time}
+      </div>
+    `:''}
+  `;
+  openModal();
+}
+
+function openDecisionModal(refId) {
+  const ref = MOCK.referrals.find(r=>r.id===refId);
+  if (!ref) return;
+
+  document.getElementById('modal-title').textContent = 'Accept or Route Referral';
+  document.getElementById('modal-subtitle').textContent = `Patient: ${ref.patient.name} · ${ref.id}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-size:13px;color:var(--ink-3);margin-bottom:16px;padding:10px 12px;background:var(--crimson-l);border-radius:8px">
+      ⚠ Patient requires: <strong>${ref.requiredTests.map(t=>t.name).join(', ')}</strong>
+    </div>
+    <div class="decision-tiles">
+      <div class="decision-tile accept" id="dt-accept" onclick="selectDecision('accept')">
+        <div class="decision-tile-icon">✅</div>
+        <div class="decision-tile-label">Accept</div>
+        <div class="decision-tile-sub">Schedule here</div>
+      </div>
+      <div class="decision-tile reject" id="dt-reject" onclick="selectDecision('reject')">
+        <div class="decision-tile-icon">🔀</div>
+        <div class="decision-tile-label">Route to Partner</div>
+        <div class="decision-tile-sub">AI will find best hospital</div>
+      </div>
+    </div>
+    <div id="decision-details" style="display:none">
+      <div id="accept-form">
+        <div class="form-section">
+          <label class="form-label">Appointment Date & Time</label>
+          <input type="datetime-local" class="form-input" id="appt-dt" value="2025-01-19T10:00">
+        </div>
+      </div>
+      <div id="reject-form" style="display:none">
+        <div class="form-section">
+          <label class="form-label">Reason for Routing</label>
+          <select class="form-select" id="reject-reason">
+            <option value="">Select reason...</option>
+            <option value="equipment_down">Equipment Not Functional (USG offline)</option>
+            <option value="overcrowded">OPD Overcrowded / No Capacity</option>
+            <option value="no_specialist">Specialist Not Available</option>
+          </select>
+        </div>
+        <div class="routing-notice">
+          <span style="font-size:20px">🗺</span>
+          <p>The AI routing engine will find the nearest empanelled private hospital with available quota and the required equipment. Patient will receive an SMS with details.</p>
+        </div>
+      </div>
+      <div id="decision-submit" style="margin-top:20px">
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn-full" id="confirm-btn" style="flex:2;padding:13px;border-radius:8px;font-weight:700;font-size:15px;border:none;cursor:pointer" onclick="confirmDecision('${refId}')">Confirm</button>
+        </div>
+      </div>
+    </div>
+  `;
+  openModal();
+}
+
+let selectedDecision = null;
+function selectDecision(type) {
+  selectedDecision = type;
+  document.getElementById('dt-accept').classList.toggle('sel', type==='accept');
+  document.getElementById('dt-reject').classList.toggle('sel', type==='reject');
+  document.getElementById('decision-details').style.display = 'block';
+  document.getElementById('accept-form').style.display = type==='accept'?'block':'none';
+  document.getElementById('reject-form').style.display = type==='reject'?'block':'none';
+
+  const btn = document.getElementById('confirm-btn');
+  if (type==='accept') {
+    btn.style.background = 'var(--green)'; btn.style.color = 'white'; btn.textContent = '✅ Confirm Appointment';
+  } else {
+    btn.style.background = 'var(--crimson)'; btn.style.color = 'white'; btn.textContent = '🔀 Route to Private Partner';
+  }
+}
+
+function confirmDecision(refId) {
+  if (!selectedDecision) return;
+  if (selectedDecision === 'reject') {
+    const reason = document.getElementById('reject-reason')?.value;
+    if (!reason) { showToast('Please select a reason', '⚠'); return; }
+    closeModal();
+    runRoutingAnimation();
+  } else {
+    closeModal();
+    const ref = MOCK.referrals.find(r=>r.id===refId);
+    if (ref) ref.status = 'accepted_govt';
+    showToast('✅ Appointment confirmed for ' + (ref?.patient.name||'patient'));
+    switchTab('govt-referrals');
+  }
+}
+
+function runRoutingAnimation() {
+  const overlay = document.getElementById('routing-overlay');
+  overlay.classList.add('show');
+  const steps = ['rs1','rs2','rs3','rs4','rs5','rs6'];
+  steps.forEach(s => { const el = document.getElementById(s); el.classList.remove('done','active'); });
+
+  let i = 0;
+  const DELAYS = [400,700,600,500,400,500];
+  function nextStep() {
+    if (i > 0) { const prev = document.getElementById(steps[i-1]); prev.classList.remove('active'); prev.classList.add('done'); }
+    if (i < steps.length) {
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+      setTimeout(nextStep, DELAYS[i-1] || 500);
+    } else {
+      setTimeout(()=>{
+        overlay.classList.remove('show');
+        MOCK.referrals.find(r=>r.status==='pending_govt') && (MOCK.referrals.find(r=>r.status==='pending_govt').status = 'routed_private');
+        showToast('🎯 Routed to Sunrise Diagnostics & Maternity · Token HRP-009 generated · SMS sent');
+        switchTab('govt-referrals');
+      }, 600);
+    }
+  }
+  nextStep();
+}
+
+function openUploadModal(refId) {
+  const ref = MOCK.privateQueue.find(r=>r.id===refId);
+  if (!ref) return;
+
+  document.getElementById('modal-title').textContent = 'Upload Test Results';
+  document.getElementById('modal-subtitle').textContent = `${ref.patient.name} · Token ${ref.slotToken}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${ref.requiredTests.map(t=>`
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s" onclick="this.style.borderColor='var(--amber)';this.style.background='var(--amber-l)'">
+          <input type="radio" name="test-sel" value="${t.code}" style="accent-color:var(--amber)">
+          ${t.name}
+        </label>
+      `).join('')}
+    </div>
+    <div class="upload-action-row">
+      <button class="upload-action-btn" onclick="simulateFileAdd('camera')">
+        <span class="upload-action-icon">📷</span><span>Camera Scan</span>
+      </button>
+      <button class="upload-action-btn" onclick="simulateFileAdd('file')">
+        <span class="upload-action-icon">📁</span><span>Pick File</span>
+      </button>
+    </div>
+    <div id="file-list"></div>
+    <div class="form-section">
+      <label class="form-label">Radiologist / Lab Notes</label>
+      <textarea class="notes-textarea" placeholder="Enter findings, values, observations..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-full btn-full-red" style="flex:2" onclick="submitUpload('${refId}')">🔒 Submit Securely</button>
+    </div>
+  `;
+  openModal();
+}
+
+let uploadedFiles = [];
+function simulateFileAdd(source) {
+  const files = source==='camera'
+    ? [{name:`scan_${Date.now()}.jpg`, icon:'🖼', size:'1.2 MB'}]
+    : [{name:`report_${Date.now()}.pdf`, icon:'📄', size:'340 KB'}];
+  uploadedFiles.push(...files);
+  const fl = document.getElementById('file-list');
+  if (!fl) return;
+  fl.innerHTML = uploadedFiles.map((f,i)=>`
+    <div class="file-preview-item">
+      <div class="file-preview-thumb">${f.icon}</div>
+      <div style="flex:1">
+        <div class="file-preview-name">${f.name}</div>
+        <div class="file-preview-size">${f.size}</div>
+      </div>
+      <button class="file-remove" onclick="removeUploadFile(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeUploadFile(i) {
+  uploadedFiles.splice(i,1);
+  simulateFileAdd._refresh?.();
+  const fl = document.getElementById('file-list');
+  if (fl) fl.innerHTML = uploadedFiles.map((f,idx)=>`
+    <div class="file-preview-item">
+      <div class="file-preview-thumb">${f.icon}</div>
+      <div style="flex:1"><div class="file-preview-name">${f.name}</div><div class="file-preview-size">${f.size}</div></div>
+      <button class="file-remove" onclick="removeUploadFile(${idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function submitUpload(refId) {
+  if (uploadedFiles.length === 0) { showToast('Please add at least one file', '⚠'); return; }
+  uploadedFiles = [];
+  closeModal();
+  showToast('✅ Results uploaded securely to govt hospital database');
+  switchTab('priv-queue');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL UTILS
+═══════════════════════════════════════════════════════════ */
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  selectedDecision = null;
+  uploadedFiles = [];
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════ */
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QR PATTERN GENERATOR (visual mock)
+═══════════════════════════════════════════════════════════ */
+function generateQRPattern() {
+  // Pre-defined QR-like pattern for demo
+  const pattern = [
+    1,1,1,1,1,1,1,0,1,0,1,
+    1,0,0,0,0,0,1,0,0,1,1,
+    1,0,1,1,1,0,1,0,1,0,0,
+    1,0,1,1,1,0,1,0,0,1,1,
+    1,0,1,1,1,0,1,0,1,1,0,
+    1,0,0,0,0,0,1,0,0,0,1,
+    1,1,1,1,1,1,1,0,1,0,1,
+    0,0,0,0,0,0,0,0,0,1,0,
+    1,0,1,1,0,1,1,0,1,0,1,
+    0,1,0,0,1,0,0,0,0,1,0,
+    1,1,1,1,1,0,1,0,1,1,1
+  ];
+  return `<div class="qr-pattern">${pattern.map(c=>`<div class="qr-cell ${c?'b':'w'}"></div>`).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUT
+═══════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
